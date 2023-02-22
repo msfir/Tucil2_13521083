@@ -28,7 +28,7 @@ func QuickSort[T comparable](data []T, compareFunc func(T, T) int) {
 	QuickSort(data[p+1:], compareFunc)
 }
 
-func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, float64) {
+func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, float32) {
 	n := len(sortedPoints)
 
 	if n == 2 {
@@ -37,14 +37,14 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 		return a, b, point.Distance(*a, *b)
 	}
 
-	mid := n/2+1
-	if mid % 2 == 1 {
+	mid := n/2 + 1
+	if mid%2 == 1 {
 		mid--
 	}
 
 	s1 := sortedPoints[:mid]
 	var s2 []point.Point3D
-	if n % 2 == 1 {
+	if n%2 == 1 {
 		s2 = sortedPoints[mid-1:]
 	} else {
 		s2 = sortedPoints[mid:]
@@ -55,7 +55,7 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 
 	var (
 		a, b *point.Point3D
-		d    float64
+		d    float32
 	)
 
 	if d1 < d2 {
@@ -75,7 +75,7 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 	}
 
 	var s []point.Point3D
-	if n % 2 == 1 {
+	if n%2 == 1 {
 		s = append(s1[i+1:], s2[1:j]...)
 	} else {
 		s = append(s1[i+1:], s2[:j]...)
@@ -85,9 +85,9 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 		for j = i + 1; j < len(s); j++ {
 			a3 := &s[i]
 			b3 := &s[j]
-			deltaX := math.Abs(a3.GetX() - b3.GetX())
-			deltaY := math.Abs(a3.GetY() - b3.GetY())
-			deltaZ := math.Abs(a3.GetZ() - b3.GetZ())
+			deltaX := float32(math.Abs(float64(a3.GetX() - b3.GetX())))
+			deltaY := float32(math.Abs(float64(a3.GetY() - b3.GetY())))
+			deltaZ := float32(math.Abs(float64(a3.GetZ() - b3.GetZ())))
 			if deltaX <= d && deltaY <= d && deltaZ <= d {
 				d3 := point.Distance(*a3, *b3)
 				if d3 < d {
@@ -100,7 +100,7 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 	return a, b, d
 }
 
-func FindClosestPoint3DPair(points []point.Point3D) (*point.Point3D, *point.Point3D, float64) {
+func FindClosestPoint3DPair(points []point.Point3D) (*point.Point3D, *point.Point3D, float32) {
 	QuickSort(points, func(a point.Point3D, b point.Point3D) int {
 		if a.GetX() < b.GetX() {
 			return -1
