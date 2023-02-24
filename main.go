@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"runtime"
+	"time"
 	"tucil/stima/pairit/algorithm"
 	"tucil/stima/pairit/point"
 	"unsafe"
@@ -101,6 +103,17 @@ func init() {
 	runtime.LockOSThread()
 }
 
+func generatePoints(n int) []point.Point3D {
+	points := make([]point.Point3D, n)
+	for i := 0; i < n; i++ {
+		x := (rand.Float32() - 0.5) * SCREEN_WIDTH
+		y := (rand.Float32() - 0.5) * SCREEN_HEIGHT
+		z := (rand.Float32() - 0.5) * SCREEN_DEPTH
+		points[i] = point.CreatePoint3D(x, y, z)
+	}
+	return points
+}
+
 func main() {
 	if err := glfw.Init(); err != nil {
 		panic(err)
@@ -121,31 +134,30 @@ func main() {
 	shaders := compileShaders()
 	shaderProgram := linkShaders(shaders)
 
-	gl.PointSize(10)
+	gl.PointSize(5)
 
-	points := []point.Point3D{
-		point.CreatePoint3D(-200, 30, 53),
-		point.CreatePoint3D(169, 44, 124),
-		point.CreatePoint3D(130, -143, -34),
-		point.CreatePoint3D(-261, 33, 211),
-		point.CreatePoint3D(236, -58, 29),
-		point.CreatePoint3D(71, 19, 99),
-		point.CreatePoint3D(-53, 79, 27),
-		point.CreatePoint3D(-38, -125, 11),
-		point.CreatePoint3D(99, -85, 40),
-		point.CreatePoint3D(120, 174, -34),
-	}
+	points := generatePoints(1000)
 
+	start := time.Now()
 	p1, p2, d := algorithm.FindClosestPoint3DPair(points)
+	elapsed := time.Since(start)
 
-	fmt.Println("===== List of Points =====")
-	for i := 0; i < len(points); i++ {
-		fmt.Printf("%v at address %p\n", points[i], &points[i])
-	}
+	// fmt.Println("===== List of Points =====")
+	// for i := 0; i < len(points); i++ {
+	// 	fmt.Printf("%v at address %p\n", points[i], &points[i])
+	// }
 	fmt.Println("===== Closest Pair =====")
 	fmt.Printf("%v at address %p\n", *p1, p1)
 	fmt.Printf("%v at address %p\n", *p2, p2)
 	fmt.Println("Distance:", d)
+	fmt.Println("Execution time:", elapsed.Microseconds(), "μs")
+	fmt.Println("Euclidean distance function calls:", point.NumOfCalls)
+
+	vaos := make([]uint32, len(points))
+
+	for i, p := range points {
+		vaos[i] = createPointVAO(p)
+	}
 
 	for !window.ShouldClose() {
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -159,11 +171,10 @@ func main() {
 			} else {
 				gl.Uniform3f(colorUniformLocation, 0, 0.8, 0.8)
 			}
-			vao := createPointVAO(points[i])
-			gl.BindVertexArray(vao)
+			gl.BindVertexArray(vaos[i])
 			gl.DrawArrays(gl.POINTS, 0, 1)
-			gl.BindVertexArray(0)
 		}
+		gl.BindVertexArray(0)
 
 		window.SwapBuffers()
 		glfw.PollEvents()

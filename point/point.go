@@ -8,11 +8,14 @@ type Point3D struct {
 	z float32
 }
 
+var NumOfCalls uint32 = 0
+
 func (p Point3D) ToSlice() []float32 {
 	return []float32{p.x, p.y, p.z}
 }
 
 func Distance(a Point3D, b Point3D) float32 {
+	NumOfCalls++;
 	deltaX := float64(a.x - b.x)
 	deltaY := float64(a.y - b.y)
 	deltaZ := float64(a.z - b.z)
