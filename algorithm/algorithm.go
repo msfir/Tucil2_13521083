@@ -28,6 +28,25 @@ func QuickSort[T comparable](data []T, compareFunc func(T, T) int) {
 	QuickSort(data[p+1:], compareFunc)
 }
 
+func BruteForceFCP(points []point.Point3D) (*point.Point3D, *point.Point3D, float32) {
+	p1 := &points[0]
+	p2 := &points[1]
+	min := point.Distance(*p1, *p2)
+	for i := 0; i < len(points); i++ {
+		for j := i + 1; j < len(points); j++ {
+			a := &points[i]
+			b := &points[j]
+			d := point.Distance(*a, *b)
+			if d < min {
+				min = d
+				p1 = a
+				p2 = b
+			}
+		}
+	}
+	return p1, p2, min
+}
+
 func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, float32) {
 	n := len(sortedPoints)
 
