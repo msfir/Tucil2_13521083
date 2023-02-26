@@ -25,7 +25,7 @@ type (
 	getInfoLog func(uint32, int32, *int32, *uint8)
 )
 
-func checkGlError(glObject uint32, errorParam uint32, getParamFn getGlParam,
+func checkGlError(glObject, errorParam uint32, getParamFn getGlParam,
 	getInfoLogFn getInfoLog, failMsg string,
 ) {
 	var success int32

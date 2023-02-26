@@ -3,9 +3,7 @@ package point
 import "math"
 
 type Point3D struct {
-	x float32
-	y float32
-	z float32
+	x, y, z float32
 }
 
 var NumOfCalls uint32 = 0
@@ -14,15 +12,15 @@ func (p Point3D) ToSlice() []float32 {
 	return []float32{p.x, p.y, p.z}
 }
 
-func Distance(a Point3D, b Point3D) float32 {
-	NumOfCalls++;
+func Distance(a, b Point3D) float32 {
+	NumOfCalls++
 	deltaX := float64(a.x - b.x)
 	deltaY := float64(a.y - b.y)
 	deltaZ := float64(a.z - b.z)
 	return float32(math.Sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ))
 }
 
-func CreatePoint3D(x float32, y float32, z float32) Point3D {
+func CreatePoint3D(x, y, z float32) Point3D {
 	return Point3D{x, y, z}
 }
 
