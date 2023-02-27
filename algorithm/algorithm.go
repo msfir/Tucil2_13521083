@@ -28,7 +28,7 @@ func QuickSort[T comparable](data []T, compareFunc func(T, T) int) {
 	QuickSort(data[p+1:], compareFunc)
 }
 
-func BruteForceFCP(points []point.Point3D) (*point.Point3D, *point.Point3D, float32) {
+func BruteForceFCP(points []point.Point3D) (*point.Point3D, *point.Point3D, float64) {
 	p1 := &points[0]
 	p2 := &points[1]
 	min := point.Distance(*p1, *p2)
@@ -47,7 +47,7 @@ func BruteForceFCP(points []point.Point3D) (*point.Point3D, *point.Point3D, floa
 	return p1, p2, min
 }
 
-func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, float32) {
+func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, float64) {
 	n := len(sortedPoints)
 
 	if n == 2 {
@@ -74,7 +74,7 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 
 	var (
 		a, b *point.Point3D
-		d    float32
+		d    float64
 	)
 
 	if d1 < d2 {
@@ -104,9 +104,9 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 		for j = i + 1; j < len(s); j++ {
 			a3 := &s[i]
 			b3 := &s[j]
-			deltaX := float32(math.Abs(float64(a3.GetX() - b3.GetX())))
-			deltaY := float32(math.Abs(float64(a3.GetY() - b3.GetY())))
-			deltaZ := float32(math.Abs(float64(a3.GetZ() - b3.GetZ())))
+			deltaX := math.Abs(a3.GetX() - b3.GetX())
+			deltaY := math.Abs(a3.GetY() - b3.GetY())
+			deltaZ := math.Abs(a3.GetZ() - b3.GetZ())
 			if deltaX <= d && deltaY <= d && deltaZ <= d {
 				d3 := point.Distance(*a3, *b3)
 				if d3 < d {
@@ -119,7 +119,8 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 	return a, b, d
 }
 
-func FindClosestPoint3DPair(points []point.Point3D) (*point.Point3D, *point.Point3D, float32) {
+func FindClosestPoint3DPair(points []point.Point3D) (*point.Point3D, *point.Point3D, float64) {
+	point.NumOfCalls = 0
 	QuickSort(points, func(a point.Point3D, b point.Point3D) int {
 		if a.GetX() < b.GetX() {
 			return -1

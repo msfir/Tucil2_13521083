@@ -13,15 +13,15 @@ import (
 	. "github.com/klauspost/cpuid/v2"
 )
 
-var upperBound float32
+var upperBound float64
 
-func generatePoints(n int, ub float32) []point.Point3D {
+func generatePoints(n int, ub float64) []point.Point3D {
 	upperBound = ub
 	points := make([]point.Point3D, n)
 	for i := 0; i < n; i++ {
-		x := rand.Float32() * upperBound
-		y := rand.Float32() * upperBound
-		z := rand.Float32() * upperBound
+		x := rand.Float64() * upperBound
+		y := rand.Float64() * upperBound
+		z := rand.Float64() * upperBound
 		points[i] = point.CreatePoint3D(x, y, z)
 	}
 	return points
@@ -38,7 +38,7 @@ input:
 		goto input // Is it bad practice? I don't think so
 	}
 
-	points := generatePoints(n, float32(n))
+	points := generatePoints(n, float64(n))
 
 	start := time.Now()
 	p1, p2, d := algorithm.FindClosestPoint3DPair(points)
@@ -48,7 +48,7 @@ input:
 	fmt.Printf("Point 2: (%v, %v %v)\n", p2.GetX(), p2.GetY(), p2.GetZ())
 	fmt.Printf("Distance: %f\n", d)
 	fmt.Printf("Execution time: %f s (%s)\n", float64(executionTime.Nanoseconds())/1e9, CPU.BrandName)
-	fmt.Printf("The Euclidean distance function is called %dx\n", point.NumOfCalls)
+	fmt.Printf("The Euclidean distance function is called %d times\n", point.NumOfCalls)
 
 	path, err := exec.LookPath("gnuplot")
 	if err != nil {
