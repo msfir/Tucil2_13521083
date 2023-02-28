@@ -44,7 +44,7 @@ func main() {
 
 inputDim:
 	fmt.Print("Dimension\t: ")
-	_, err := fmt.Scanf("%d ", &dim)
+	_, err := fmt.Scanf("%d\n", &dim)
 	if err != nil || dim < 2 {
 		fmt.Println("Invalid input!")
 		goto inputDim // Is it bad practice? I don't think so
@@ -52,7 +52,7 @@ inputDim:
 
 inputN:
 	fmt.Print("Number of points: ")
-	_, err = fmt.Scanf("%d ", &n)
+	_, err = fmt.Scanf("%d\n", &n)
 	if err != nil || n < 2 {
 		fmt.Println("Invalid input!")
 		goto inputN
