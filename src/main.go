@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"io"
 	"math/rand"
@@ -24,6 +25,9 @@ var (
 	p1, p2     *Point
 	plotData   *os.File
 )
+
+//go:embed banner
+var banner string
 
 func main() {
 	// handle SIGTERM and SIGINT for delete temporary file (plotData)
@@ -186,11 +190,7 @@ func generatePoints(dim, n int, ub float64) []Point {
 }
 
 func printBanner() {
-	if banner, err := os.ReadFile("banner"); err != nil {
-		fmt.Println("**", err.Error())
-	} else {
-		fmt.Print(string(banner))
-	}
+	fmt.Print(banner)
 }
 
 func deleteTempFile() {

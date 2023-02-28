@@ -25,6 +25,9 @@ var (
 	plotData   *os.File
 )
 
+//go:embed banner
+var banner string
+
 func main() {
 	// handle SIGTERM and SIGINT for delete temporary file (plotData)
 	sig := make(chan os.Signal, 1)
