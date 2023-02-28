@@ -2,48 +2,34 @@ package point
 
 import "math"
 
-type Point3D struct {
-	x, y, z float64
+type Point struct {
+	dim    int
+	coord []float64
 }
 
 var NumOfCalls uint32 = 0
 
-func (p Point3D) ToSlice() []float64 {
-	return []float64{p.x, p.y, p.z}
-}
-
-func Distance(a, b Point3D) float64 {
+func EuclideanDistance(a, b Point) float64 {
+	if a.dim != b.dim {
+		panic("Both points must have same dimension")
+	}
 	NumOfCalls++
-	deltaX := float64(a.x - b.x)
-	deltaY := float64(a.y - b.y)
-	deltaZ := float64(a.z - b.z)
-	return math.Sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ)
+	sum := 0.
+	for i := 0; i < a.dim; i++ {
+		delta := a.GetCoord()[i] - b.GetCoord()[i]
+		sum += delta * delta
+	}
+	return math.Sqrt(sum)
 }
 
-func CreatePoint3D(x, y, z float64) Point3D {
-	return Point3D{x, y, z}
+func CreatePoint(coords ...float64) Point {
+	return Point{len(coords), coords}
 }
 
-func (p Point3D) GetX() float64 {
-	return p.x
+func (p Point) GetCoord() []float64 {
+	return p.coord
 }
 
-func (p *Point3D) SetX(x float64) {
-	p.x = x
-}
-
-func (p Point3D) GetY() float64 {
-	return p.y
-}
-
-func (p *Point3D) SetY(y float64) {
-	p.y = y
-}
-
-func (p Point3D) GetZ() float64 {
-	return p.z
-}
-
-func (p *Point3D) SetZ(z float64) {
-	p.z = z
+func (p Point) GetDimension() int {
+	return p.dim
 }

@@ -5,7 +5,7 @@ import (
 	"tucil/stima/pairit/point"
 )
 
-func QuickSort[T comparable](data []T, compareFunc func(T, T) int) {
+func QuickSort[T any](data []T, compareFunc func(T, T) int) {
 	if len(data) <= 1 {
 		return
 	}
@@ -28,15 +28,15 @@ func QuickSort[T comparable](data []T, compareFunc func(T, T) int) {
 	QuickSort(data[p+1:], compareFunc)
 }
 
-func BruteForceFCP(points []point.Point3D) (*point.Point3D, *point.Point3D, float64) {
+func BruteForceFCP(points []point.Point) (*point.Point, *point.Point, float64) {
 	p1 := &points[0]
 	p2 := &points[1]
-	min := point.Distance(*p1, *p2)
+	min := point.EuclideanDistance(*p1, *p2)
 	for i := 0; i < len(points); i++ {
 		for j := i + 1; j < len(points); j++ {
 			a := &points[i]
 			b := &points[j]
-			d := point.Distance(*a, *b)
+			d := point.EuclideanDistance(*a, *b)
 			if d < min {
 				min = d
 				p1 = a
@@ -47,13 +47,13 @@ func BruteForceFCP(points []point.Point3D) (*point.Point3D, *point.Point3D, floa
 	return p1, p2, min
 }
 
-func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, float64) {
+func fcpImpl(sortedPoints []point.Point) (*point.Point, *point.Point, float64) {
 	n := len(sortedPoints)
 
 	if n == 2 {
 		a := &sortedPoints[0]
 		b := &sortedPoints[1]
-		return a, b, point.Distance(*a, *b)
+		return a, b, point.EuclideanDistance(*a, *b)
 	}
 
 	mid := n/2 + 1
@@ -62,7 +62,7 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 	}
 
 	s1 := sortedPoints[:mid]
-	var s2 []point.Point3D
+	var s2 []point.Point
 	if n%2 == 1 {
 		s2 = sortedPoints[mid-1:]
 	} else {
@@ -73,7 +73,7 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 	a2, b2, d2 := fcpImpl(s2)
 
 	var (
-		a, b *point.Point3D
+		a, b *point.Point
 		d    float64
 	)
 
@@ -84,16 +84,16 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 	}
 
 	i := len(s1) - 1
-	for i >= 0 && s1[i].GetX() > sortedPoints[n/2].GetX()-d {
+	for i >= 0 && s1[i].GetCoord()[0] > sortedPoints[n/2].GetCoord()[0]-d {
 		i--
 	}
 
 	j := 0
-	for j < len(s2) && s2[j].GetX() < sortedPoints[n/2].GetX()+d {
+	for j < len(s2) && s2[j].GetCoord()[0] < sortedPoints[n/2].GetCoord()[0]+d {
 		j++
 	}
 
-	var s []point.Point3D
+	var s []point.Point
 	if n%2 == 1 {
 		s = append(s1[i+1:], s2[1:j]...)
 	} else {
@@ -104,11 +104,13 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 		for j = i + 1; j < len(s); j++ {
 			a3 := &s[i]
 			b3 := &s[j]
-			deltaX := math.Abs(a3.GetX() - b3.GetX())
-			deltaY := math.Abs(a3.GetY() - b3.GetY())
-			deltaZ := math.Abs(a3.GetZ() - b3.GetZ())
-			if deltaX <= d && deltaY <= d && deltaZ <= d {
-				d3 := point.Distance(*a3, *b3)
+			ok := true
+			for k := 0; k < a.GetDimension() && ok; k++ {
+				delta := math.Abs(a3.GetCoord()[k] - b3.GetCoord()[k])
+				ok = ok && delta < d
+			}
+			if ok {
+				d3 := point.EuclideanDistance(*a3, *b3)
 				if d3 < d {
 					a, b, d = a3, b3, d3
 				}
@@ -119,12 +121,12 @@ func fcpImpl(sortedPoints []point.Point3D) (*point.Point3D, *point.Point3D, floa
 	return a, b, d
 }
 
-func FindClosestPoint3DPair(points []point.Point3D) (*point.Point3D, *point.Point3D, float64) {
+func FindClosestPointPair(points []point.Point) (*point.Point, *point.Point, float64) {
 	point.NumOfCalls = 0
-	QuickSort(points, func(a point.Point3D, b point.Point3D) int {
-		if a.GetX() < b.GetX() {
+	QuickSort(points, func(a, b point.Point) int {
+		if a.GetCoord()[0] < b.GetCoord()[0] {
 			return -1
-		} else if a.GetX() > b.GetX() {
+		} else if a.GetCoord()[0] > b.GetCoord()[0] {
 			return 1
 		} else {
 			return 0

@@ -15,14 +15,14 @@ import (
 
 var upperBound float64
 
-func generatePoints(n int, ub float64) []point.Point3D {
+func generatePoints(n int, ub float64) []point.Point {
 	upperBound = ub
-	points := make([]point.Point3D, n)
+	points := make([]point.Point, n)
 	for i := 0; i < n; i++ {
 		x := rand.Float64() * upperBound
 		y := rand.Float64() * upperBound
 		z := rand.Float64() * upperBound
-		points[i] = point.CreatePoint3D(x, y, z)
+		points[i] = point.CreatePoint(x, y, z)
 	}
 	return points
 }
@@ -32,7 +32,7 @@ func main() {
 
 input:
 	fmt.Print("Number of points: ")
-	_, err := fmt.Scan(&n)
+	_, err := fmt.Scanf("%d", &n)
 	if err != nil || n < 2 {
 		fmt.Println("Invalid input!")
 		goto input // Is it bad practice? I don't think so
@@ -41,14 +41,14 @@ input:
 	points := generatePoints(n, float64(n))
 
 	start := time.Now()
-	p1, p2, d := algorithm.FindClosestPoint3DPair(points)
+	p1, p2, d := algorithm.FindClosestPointPair(points)
 	executionTime := time.Since(start)
 	fmt.Println("====== Closest Pair ======")
-	fmt.Printf("Point 1: (%v, %v %v)\n", p1.GetX(), p1.GetY(), p1.GetZ())
-	fmt.Printf("Point 2: (%v, %v %v)\n", p2.GetX(), p2.GetY(), p2.GetZ())
+	fmt.Printf("Point 1: (%v, %v, %v)\n", p1.GetCoord()[0], p1.GetCoord()[1], p1.GetCoord()[2])
+	fmt.Printf("Point 2: (%v, %v, %v)\n", p2.GetCoord()[0], p2.GetCoord()[1], p2.GetCoord()[2])
 	fmt.Printf("Distance: %f\n", d)
 	fmt.Printf("Execution time: %f s (%s)\n", float64(executionTime.Nanoseconds())/1e9, CPU.BrandName)
-	fmt.Printf("The Euclidean distance function is called %d times\n", point.NumOfCalls)
+	fmt.Printf("The Euclidean distance function is called %dx\n", point.NumOfCalls)
 
 	path, err := exec.LookPath("gnuplot")
 	if err != nil {
@@ -61,9 +61,9 @@ input:
 			panic(err_str)
 		}
 		for i := 0; i < n; i++ {
-			x := points[i].GetX()
-			y := points[i].GetY()
-			z := points[i].GetZ()
+			x := points[i].GetCoord()[0]
+			y := points[i].GetCoord()[1]
+			z := points[i].GetCoord()[2]
 			color := 0
 			if &points[i] == p1 || &points[i] == p2 {
 				color = 7
