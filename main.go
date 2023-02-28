@@ -98,9 +98,9 @@ func runGnuplot(path string) {
 	}
 	var format string
 	if dim == 3 {
-		format = "splot \"%s\" u 1:2:3:4 t \"\" w p pt 7 ps 1 lc variable"
+		format = "splot '%s' u 1:2:3:4 t '' w p pt 7 ps 1 lc variable"
 	} else {
-		format = "plot \"%s\" u 1:2:3 t \"\" w p pt 7 ps 1 lc variable"
+		format = "plot '%s' u 1:2:3 t '' w p pt 7 ps 1 lc variable"
 	}
 	cmd := fmt.Sprintf(format, plotData.Name())
 	plotCmd(stdin, "set term qt title 'PairIt'")
@@ -189,7 +189,7 @@ func printBanner() {
 	if banner, err := os.ReadFile("banner"); err != nil {
 		fmt.Println("**", err.Error())
 	} else {
-		fmt.Println(string(banner))
+		fmt.Print(string(banner))
 	}
 }
 
