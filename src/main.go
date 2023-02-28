@@ -30,7 +30,7 @@ var (
 var banner string
 
 func main() {
-	// handle SIGTERM and SIGINT for delete temporary file (plotData)
+	// handle SIGTERM and SIGINT for deleting temporary file (plotData)
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
@@ -40,11 +40,11 @@ func main() {
 	}()
 	defer deleteTempFile()
 
-	printBanner()
+	fmt.Print(banner)
 
 inputDim:
 	fmt.Print("Dimension\t: ")
-	_, err := fmt.Scanf("%d", &dim)
+	_, err := fmt.Scanf("%d ", &dim)
 	if err != nil || dim < 2 {
 		fmt.Println("Invalid input!")
 		goto inputDim // Is it bad practice? I don't think so
@@ -52,7 +52,7 @@ inputDim:
 
 inputN:
 	fmt.Print("Number of points: ")
-	_, err = fmt.Scanf("%d", &n)
+	_, err = fmt.Scanf("%d ", &n)
 	if err != nil || n < 2 {
 		fmt.Println("Invalid input!")
 		goto inputN
@@ -187,10 +187,6 @@ func generatePoints(dim, n int, ub float64) []Point {
 		points[i] = CreatePoint(coord...)
 	}
 	return points
-}
-
-func printBanner() {
-	fmt.Print(banner)
 }
 
 func deleteTempFile() {
