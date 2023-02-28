@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 	"tucil/stima/pairit/algorithm"
@@ -90,28 +91,43 @@ func performFcpAlgorithm(title string, algo fcpFunction) {
 }
 
 func runGnuplot(path string) {
-	proc := exec.Command(path)
-	stdin, _ := proc.StdinPipe()
-	if err := proc.Start(); err != nil {
-		err_str := fmt.Sprintln("**", err.Error())
-		panic(err_str)
-	}
+	var proc *exec.Cmd
 	var format string
 	if dim == 3 {
 		format = "splot \"%s\" u 1:2:3:4 t \"\" w p pt 7 ps 1 lc variable"
 	} else {
 		format = "plot \"%s\" u 1:2:3 t \"\" w p pt 7 ps 1 lc variable"
 	}
-	cmd := fmt.Sprintf(format, plotData.Name())
-	plotCmd(stdin, "set term qt title 'PairIt'")
-	plotCmd(stdin, fmt.Sprintf("set xrange [0:%f]", upperBound))
-	plotCmd(stdin, fmt.Sprintf("set yrange [0:%f]", upperBound))
-	if dim == 3 {
-		plotCmd(stdin, fmt.Sprintf("set zrange [0:%f]", upperBound))
+	commands := []string{
+		"set term qt title 'PairIt'",
+		fmt.Sprintf("set xrange [0:%f]", upperBound),
+		fmt.Sprintf("set yrange [0:%f]", upperBound),
 	}
-	plotCmd(stdin, cmd)
-	plotCmd(stdin, "pause mouse close")
-	plotCmd(stdin, "q")
+	if dim == 3 {
+		commands = append(commands, fmt.Sprintf("set zrange [0:%f]", upperBound))
+	}
+	commands = append(commands,
+		fmt.Sprintf(format, plotData.Name()),
+		"pause mouse close",
+		"q",
+	)
+	if runtime.GOOS != "windows" {
+		proc = exec.Command(path)
+		stdin, _ := proc.StdinPipe()
+		if err := proc.Start(); err != nil {
+			err_str := fmt.Sprintln("**", err.Error())
+			panic(err_str)
+		}
+		for _, s := range commands {
+			plotCmd(stdin, s)
+		}
+	} else {
+		proc = exec.Command(path, append(commands, "-e")...)
+		if err := proc.Start(); err != nil {
+			err_str := fmt.Sprintln("**", err.Error())
+			panic(err_str)
+		}
+	}
 	if err := proc.Wait(); err != nil {
 		err_str := fmt.Sprintln("**", err.Error())
 		panic(err_str)
