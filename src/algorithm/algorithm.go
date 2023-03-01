@@ -5,7 +5,9 @@ import (
 	"tucil/stima/pairit/point"
 )
 
-func QuickSort[T any](data []T, compareFunc func(T, T) int) {
+var sortKey = 0
+
+func QuickSort[T any](data []T, compareFunc func(T, T) bool) {
 	if len(data) <= 1 {
 		return
 	}
@@ -16,7 +18,7 @@ func QuickSort[T any](data []T, compareFunc func(T, T) int) {
 	p := -1
 
 	for q := 0; q < pivotIdx; q++ {
-		if compareFunc(data[q], pivot) <= 0 {
+		if compareFunc(data[q], pivot) {
 			p++
 			data[p], data[q] = data[q], data[p]
 		}
@@ -56,10 +58,7 @@ func fcpImpl(sortedPoints []point.Point) (*point.Point, *point.Point, float64) {
 		return a, b, point.EuclideanDistance(*a, *b)
 	}
 
-	mid := n/2 + 1
-	if mid%2 == 1 {
-		mid--
-	}
+	mid := int(math.Ceil(float64(n)/2))
 
 	s1 := sortedPoints[:mid]
 	var s2 []point.Point
@@ -100,16 +99,19 @@ func fcpImpl(sortedPoints []point.Point) (*point.Point, *point.Point, float64) {
 		s = append(s1[i+1:], s2[:j]...)
 	}
 
+	if sortKey < a.GetDimension() - 1 {
+		sortKey++
+		a, b, d = fcpIntermediete(s)
+	}
+
 	for i = 0; i < len(s); i++ {
 		for j = i + 1; j < len(s); j++ {
 			a3 := &s[i]
 			b3 := &s[j]
-			ok := true
-			for k := 0; k < a.GetDimension() && ok; k++ {
-				delta := math.Abs(a3.GetCoord()[k] - b3.GetCoord()[k])
-				ok = ok && delta < d
-			}
-			if ok {
+			m1 := a3.GetCoord()[a3.GetDimension() - 1]
+			m2 := b3.GetCoord()[b3.GetDimension() - 1]
+			delta := math.Abs(m1 - m2)
+			if delta < d {
 				d3 := point.EuclideanDistance(*a3, *b3)
 				if d3 < d {
 					a, b, d = a3, b3, d3
@@ -117,20 +119,19 @@ func fcpImpl(sortedPoints []point.Point) (*point.Point, *point.Point, float64) {
 			}
 		}
 	}
-
 	return a, b, d
 }
 
-func FindClosestPointPair(points []point.Point) (*point.Point, *point.Point, float64) {
+func FindClosestPairOfPoints(points []point.Point) (*point.Point, *point.Point, float64) {
 	point.NumOfCalls = 0
-	QuickSort(points, func(a, b point.Point) int {
-		if a.GetCoord()[0] < b.GetCoord()[0] {
-			return -1
-		} else if a.GetCoord()[0] > b.GetCoord()[0] {
-			return 1
-		} else {
-			return 0
-		}
+	a, b, d := fcpIntermediete(points)
+	sortKey = 0
+	return a, b, d
+}
+
+func fcpIntermediete(points []point.Point) (*point.Point, *point.Point, float64) {
+	QuickSort(points, func(a, b point.Point) bool {
+		return a.GetCoord()[sortKey] < b.GetCoord()[sortKey]
 	})
 	return fcpImpl(points)
 }

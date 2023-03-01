@@ -45,7 +45,7 @@ func main() {
 inputDim:
 	fmt.Print("Dimension\t: ")
 	_, err := fmt.Scanf("%d\n", &dim)
-	if err != nil || dim < 2 {
+	if err != nil || dim < 1 {
 		fmt.Println("Invalid input!")
 		goto inputDim // Is it bad practice? I don't think so
 	}
@@ -59,11 +59,11 @@ inputN:
 	}
 
 	points = generatePoints(dim, n, float64(n))
-	performFcpAlgorithm("Divide and Conquer", algorithm.FindClosestPointPair)
+	performFcpAlgorithm("Divide and Conquer", algorithm.FindClosestPairOfPoints)
 	performFcpAlgorithm("Brute Force", algorithm.BruteForceFCP)
 
 	path, err := exec.LookPath("gnuplot")
-	if dim <= 3 {
+	if dim > 1 && dim <= 3 {
 		if err != nil {
 			fmt.Println("Gnuplot not found in your PATH. Visualization is not performed")
 		} else {
@@ -89,7 +89,8 @@ func performFcpAlgorithm(title string, algo fcpFunction) {
 	fmt.Printf("Point 1\t\t: %v\n", p1.GetCoord())
 	fmt.Printf("Point 2\t\t: %v\n", p2.GetCoord())
 	fmt.Printf("Distance\t: %f\n", d)
-	fmt.Printf("Execution time\t: %.9f s (%s)\n", float64(executionTime.Nanoseconds())/1e9, CPU.BrandName)
+	timeSec := float64(executionTime.Nanoseconds())/1e9
+	fmt.Printf("Execution time\t: %.9f s (%s)\n", timeSec, CPU.BrandName)
 	fmt.Printf("The Euclidean distance function is called %dx\n", NumOfCalls)
 }
 
